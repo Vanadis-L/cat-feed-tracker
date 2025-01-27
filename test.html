@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neighborhood Cat Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .cat-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 600px;
+        }
+        .cat-photo {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+        }
+        .info, .contact, .language-selector {
+            margin: 15px 0;
+        }
+        .buttons button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .buttons button.cat-food { background-color: #4CAF50; color: white; }
+        .buttons button.cans { background-color: #2196F3; color: white; }
+        .buttons button.others { background-color: #FF9800; color: white; }
+        .buttons button:hover {
+            opacity: 0.9;
+        }
+        .input-field {
+            margin: 10px 0;
+        }
+        .input-field input {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 400px;
+            margin-top: 5px;
+        }
+        .records, .messages, .photo-upload {
+            text-align: left;
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .records ul, .messages ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .records li, .messages li {
+            background-color: #f9f9f9;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .language-selector select {
+            padding: 10px;
+            font-size: 16px;
+        }
+        .show-complete {
+            margin: 10px 0;
+            text-align: center;
+        }
+        .show-complete button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .show-complete button:hover {
+            background-color: #45a049;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50; /* 默认绿色背景 */
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .notification.error {
+            background-color: #f44336; /* 红色背景 */
+        }
+
+        .notification.info {
+            background-color: #2196F3; /* 蓝色背景 */
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="language-selector">
+    <label for="language">Select Language:</label>
+    <select id="language" onchange="changeLanguage()">
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="ta">தமிழ்</option>
+    </select>
+</div>
+<div class="cat-container">
+    <h1 id="title">Meet Our Neighborhood Cat!</h1>
+    <img src="cat_photo.jpg" alt="Neighborhood Cat" class="cat-photo">
+    <div class="info">
+        <p><strong id="age-label">Age:</strong> Unknown</p>
+        <p><strong id="gender-label">Gender:</strong> Male</p>
+    </div>
+    <div class="input-field">
+        <label id="username-label" for="username">Your Name:</label>
+        <input type="text" id="username" placeholder="Enter your name">
+    </div>
+
+
+<div class="buttons">
+    <button id="cat-food-btn" class="cat-food" onclick="recordFeeding('Cat Food')">Cat Food</button>
+    <button id="cans-btn" class="cans" onclick="recordFeeding('Cans')">Cans</button>
+    <button id="others-btn" class="others" onclick="recordFeeding('Others')">Others</button>
+</div>
+
+</div>
+
+<div class="records">
+    <h2 id="feeding-records-title">Feeding Records</h2>
+    <ul id="recordList"></ul>
+    <div class="show-complete">
+        <button id="show-complete-log-btn" onclick="showCompleteLog()">Show Complete Log</button>
+    </div>
+</div>
+
+
+
+
+
+<div class="messages">
+    <h2 id="messages-title">Message Board</h2>
+    <ul id="messageList"></ul>
+    <div class="input-field">
+        <input type="text" id="messageInput" placeholder="Leave a message">
+        <button id="post-button" onclick="postMessage()">Post</button>
+    </div>
+</div>
+
+
+<div class="photo-upload">
+    <h2>Photo Upload</h2>
+    <div class="input-field">
+        <label id="upload-photo-label" for="photoUpload">Upload Your Photo:</label>
+        <input type="file" id="photoUpload" accept="image/*">
+        <button onclick="uploadPhoto()">Upload</button>
+    </div>
+
+
+    <div id="uploadedPhotos">
+        <h3>Uploaded Photos</h3>
+        <ul id="photoList"></ul>
+    </div>
+</div>
+<div class="contact">
+    <p id="contact-text">If you have any suggestions or just want to chat, please feel free to contact us at: <a href="mailto:Vanadis_L@outlook.com">Vanadis_L@outlook.com</a></p>
+</div>
+
+<script type="module">
+    const feedingRecords = [];
+    const uploadedPhotos = [];
+
+    async function recordFeeding(type) {
+        const username = document.getElementById('username').value || "Anonymous";
+
+        const record = {
+            username,
+            type,
+            time: new Date().toISOString(),
+            deleted: false
+        };
+
+        feedingRecords.unshift(record); // Add to the beginning of the array
+        if (feedingRecords.length > 10) feedingRecords.pop(); // Keep only the last 10 records
+
+        renderRecords();
+        alert("Feeding record added!");
+    }
+
+
+
+    
+    function renderRecords() {
+        const recordList = document.getElementById('recordList');
+        recordList.innerHTML = "";
+        feedingRecords.forEach((record, index) => {
+            if (!record.deleted) {
+                const recordItem = document.createElement('li');
+                recordItem.textContent = `${record.username} fed ${record.type} at ${new Date(record.time).toLocaleString()}`;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Delete";
+                deleteButton.style.marginLeft = "10px";
+                deleteButton.onclick = () => deleteRecord(index);
+
+                recordItem.appendChild(deleteButton);
+                recordList.appendChild(recordItem);
+            }
+        });
+    }
+
+
+    
+
+
+    function deleteRecord(index) {
+        feedingRecords[index].deleted = true;
+        renderRecords();
+    }
+
+    function showCompleteLog() {
+        const completeLog = feedingRecords.map(record => {
+            return `${record.username} fed ${record.type} at ${new Date(record.time).toLocaleString()}${record.deleted ? " (deleted)" : ""}`;
+        }).join("\n");
+
+        alert(`Complete Feeding Log:\n\n${completeLog}`);
+    }
+
+    function postMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value;
+        if (!message) return alert("Message cannot be empty!");
+
+        const messageList = document.getElementById('messageList');
+        const listItem = document.createElement('li');
+        listItem.textContent = message;
+        messageList.appendChild(listItem);
+        messageInput.value = "";
+    }
+
+
+       
+function uploadPhoto() {
+    const photoInput = document.getElementById('photoUpload');
+    const photoFile = photoInput.files[0];
+
+    if (!photoFile) {
+        alert("No photo selected!");
+        return;
+    }
+
+    const photoURL = URL.createObjectURL(photoFile); // 创建对象 URL
+    uploadedPhotos.push(photoURL);
+
+    const photoList = document.getElementById('photoList');
+    const listItem = document.createElement('li');
+    const img = document.createElement('img');
+    img.src = photoURL;
+    img.alt = photoFile.name;
+    img.style.maxWidth = "100px";
+    img.style.borderRadius = "5px";
+
+    listItem.appendChild(img);
+    photoList.appendChild(listItem);
+
+    // 清理对象 URL
+    photoInput.value = "";
+    alert("Photo uploaded!");
+}
+
+function changeLanguage() {
+    const language = document.getElementById('language').value;
+
+    const translations = {
+    en: {
+        title: "Meet Our Neighborhood Cat!",
+        ageLabel: "Age:",
+        genderLabel: "Gender:",
+        usernameLabel: "Your Name:",
+        photoUploadLabel: "Upload Your Photo:",
+        messagesTitle: "Message Board",
+        messagePlaceholder: "Leave a message",
+        postButton: "Post",
+        contactText: "If you have any suggestions or just want to chat, please feel free to contact us at: Vanadis_L@outlook.com",
+        catFood: "Cat Food",
+        cans: "Cans",
+        others: "Others",
+        feedingRecordsTitle: "Feeding Records",
+        showCompleteLog: "Show Complete Log"
+    },
+    zh: {
+        title: "一起喂养我们的社区猫！",
+        ageLabel: "年龄：",
+        genderLabel: "性别：",
+        usernameLabel: "你的名字：",
+        photoUploadLabel: "上传你的照片：",
+        messagesTitle: "留言板",
+        messagePlaceholder: "留下你的留言",
+        postButton: "发布",
+        contactText: "如果有任何意见建议或者想聊聊天，可以联系邮箱：Vanadis_L@outlook.com",
+        catFood: "猫粮",
+        cans: "罐头",
+        others: "其他",
+        feedingRecordsTitle: "喂养记录",
+        showCompleteLog: "显示完整记录"
+    },
+    ms: {
+        title: "Jom Beri Makan Kucing Kejiranan Kami!",
+        ageLabel: "Umur:",
+        genderLabel: "Jantina:",
+        usernameLabel: "Nama Anda:",
+        photoUploadLabel: "Muat Naik Gambar Anda:",
+        messagesTitle: "Papan Mesej",
+        messagePlaceholder: "Tinggalkan mesej anda",
+        postButton: "Hantar",
+        contactText: "Jika anda ada cadangan atau ingin berbual, sila hubungi kami di: Vanadis_L@outlook.com",
+        catFood: "Makanan Kucing",
+        cans: "Tin",
+        others: "Lain-lain",
+        feedingRecordsTitle: "Rekod Pemakanan",
+        showCompleteLog: "Tunjukkan Log Lengkap"
+    },
+    ta: {
+        title: "எங்கள் அயல்நகர பூனைக்கு உணவு அளிக்கலாம்!",
+        ageLabel: "வயது:",
+        genderLabel: "பாலினம்:",
+        usernameLabel: "உங்கள் பெயர்:",
+        photoUploadLabel: "உங்கள் புகைப்படத்தை பதிவேற்றவும்:",
+        messagesTitle: "செய்தி பலகை",
+        messagePlaceholder: "உங்கள் செய்தியை விடுங்கள்",
+        postButton: "அனுப்பவும்",
+        contactText: "உங்களுக்கு ஏதேனும் பரிந்துரை அல்லது உரையாட விருப்பமா? எங்களை தொடர்பு கொள்ளவும்: Vanadis_L@outlook.com",
+        catFood: "பூனை உணவு",
+        cans: "குடுவை",
+        others: "மற்றவை",
+        feedingRecordsTitle: "உணவு பதிவுகள்",
+        showCompleteLog: "முழு பதிவுகளை காணவும்"
+    }
+};
+
+    
+    // 获取翻译内容
+    const texts = translations[language];
+
+    // 更新页面内容
+    document.getElementById('title').textContent = texts.title;
+    document.getElementById('age-label').textContent = texts.ageLabel;
+    document.getElementById('gender-label').textContent = texts.genderLabel;
+    document.getElementById('upload-photo-label').textContent = texts.photoUploadLabel;
+    document.getElementById('messages-title').textContent = texts.messagesTitle;
+    document.getElementById('messageInput').placeholder = texts.messagePlaceholder;
+    document.getElementById('post-button').textContent = texts.postButton;
+    document.getElementById('contact-text').textContent = texts.contactText;
+    document.getElementById('username-label').textContent = texts.usernameLabel;
+
+    // 更新按钮文本
+    document.querySelector('.cat-food').textContent = texts.catFood;
+    document.querySelector('.cans').textContent = texts.cans;
+    document.querySelector('.others').textContent = texts.others;
+    document.querySelector('#feeding-records-title').textContent = texts.feedingRecordsTitle;
+    document.querySelector('#show-complete-log-btn').textContent = texts.showCompleteLog;
+
+
+
+
+
+// 初始化默认语言
+document.addEventListener('DOMContentLoaded', () => {
+    changeLanguage();
+})};
+
+function showNotification(message, type = "success") {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = `notification show ${type}`; // 设置类型
+    notification.classList.remove('hidden');
+
+    // 自动隐藏
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
+
+window.recordFeeding = recordFeeding;
+window.postMessage = postMessage;
+window.uploadPhoto = uploadPhoto;
+window.showCompleteLog = showCompleteLog;
+window.changeLanguage = changeLanguage;
+
+// 成功的消息
+showNotification("Feeding record added successfully!");
+
+// 错误的消息
+showNotification("Failed to add feeding record. Please try again.", "error");
+
+</script>
+</body>
+</html>
